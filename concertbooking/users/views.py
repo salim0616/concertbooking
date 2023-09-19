@@ -42,8 +42,6 @@ def login(request):
         """
 
         generating new token on each login request.
-        The logic here was one login should have only token working at a time.
-        As concurrent sessions are not enabled.
 
         """
         user = authenticate(
