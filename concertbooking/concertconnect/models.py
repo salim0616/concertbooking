@@ -62,5 +62,7 @@ class Booking(models.Model):
     )
     is_cancelled = models.BooleanField(default=False)
 
+    objects=models.Manager()
+
     class Meta:
         db_table = "bookings"

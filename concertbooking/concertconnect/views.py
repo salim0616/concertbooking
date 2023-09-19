@@ -1,6 +1,7 @@
 import logging
 import os
 import uuid
+
 # from django.core.exceptions import ValidationError
 from datetime import datetime
 
@@ -19,8 +20,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from common.utils import dummy_payment_api, response_generator
 
 from .models import Booking, Concert, Tier, Venue
-from .serializers import (BookingSerializer, ConcertSerilizer,
-                          TierManagementSerializer)
+from .serializers import BookingSerializer, ConcertSerilizer, TierManagementSerializer
 
 """
     Venue manageement and tier management will done by the host company or
@@ -175,9 +175,14 @@ def Concertdetail(self, pk):
 class BookingMangement(APIView):
     authentication_classes = [JWTAuthentication]
 
+    # def get_queryset(self):
+
     def get(self, request):
         # query=Q(,user=request.user)
-        data = Booking.objects.filter(user=request.user).values()
+        # print(pk)
+        data = BookingSerializer(
+            Booking.objects.select_related().filter(user=request.user), many=True
+        ).data
 
         return response_generator(status.HTTP_200_OK, data)
 
@@ -211,7 +216,7 @@ class BookingMangement(APIView):
 
         # booking_serializer.save()
 
-    def delete(self, request,pk):
+    def delete(self, request, pk):
         try:
             booking = Booking.objects.get(id=pk)
         except Booking.DoesNotExist:
@@ -221,7 +226,7 @@ class BookingMangement(APIView):
 
         if booking.concert.launch_date <= datetime.utcnow().date():
             return response_generator(
-                status.HTTP_404_NOT_FOUND, "Ticket Cannot be cancelled"
+                status.HTTP_400_BAD_REQUEST, "Ticket Cannot be cancelled"
             )
 
         booking.is_cancelled = True

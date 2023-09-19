@@ -84,20 +84,20 @@ class ConcertSerilizer(serializers.ModelSerializer):
         response["created_on"] = instance.created_on.timestamp()
         response["venue"] = VenueSerializer(instance.venue).data
         response["concert_by"] = UserSerializer(instance.concert_by).data
-        # response["concert_images"] = []
+        response["concert_images"] = []
 
-        # # converting the images related to concert into base64 encode to send to frontend.
-        # fs = FileSystemStorage(settings.MEDIA_ROOT)
-        # if fs:
-        #     if fs.exists(str(instance.id)):
-        #         for img in fs.listdir(str(instance.id) + "/")[1]:
-        #             img_path = str(
-        #                 settings.MEDIA_ROOT + str(instance.id) + "/" + img + "/"
-        #             ).replace("\\", "/")
-        #             with fs.open(img_path, "rb") as f:
-        #                 img_data = f.read()
-        #                 encoded_image = base64.b64encode(img_data).decode("utf-8")
-        #                 response["concert_images"].append(encoded_image)
+        # converting the images related to concert into base64 encode to send to frontend.
+        fs = FileSystemStorage(settings.MEDIA_ROOT)
+        if fs:
+            if fs.exists(str(instance.id)):
+                for img in fs.listdir(str(instance.id) + "/")[1]:
+                    img_path = str(
+                        settings.MEDIA_ROOT + str(instance.id) + "/" + img + "/"
+                    ).replace("\\", "/")
+                    with fs.open(img_path, "rb") as f:
+                        img_data = f.read()
+                        encoded_image = base64.b64encode(img_data).decode("utf-8")
+                        response["concert_images"].append(encoded_image)
         return response
 
 
@@ -114,7 +114,6 @@ class BookingSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
-        # print(data["tier"].venue_id, data["concert"].venue_id)
         # Edge case which is possible from payload manipulation
         if data["tier"].venue_id != data["concert"].venue_id:
             raise serializers.ValidationError("concert and tier venue should match")
@@ -123,16 +122,15 @@ class BookingSerializer(serializers.ModelSerializer):
                 "tickets", flat=True
             )
         )
-        # print(total_available_tickets)
         if total_available_tickets < data["tickets"]:
             raise serializers.ValidationError(
                 f" only {total_available_tickets} tickets available"
             )
         return data
 
-    # def create(self,validated_data):
-
-    #     print(validated_data)
-
-    # def to_representation(self, instance):
-    #     return super().to_representation(instance)
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response["venue"] = instance.concert.venue.name
+        response["tier"] = instance.tier.name
+        response["concert"] = instance.concert.concert_by.name
+        return response
