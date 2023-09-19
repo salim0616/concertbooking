@@ -211,9 +211,9 @@ class BookingMangement(APIView):
 
         # booking_serializer.save()
 
-    def delete(self, pk):
+    def delete(self, request,pk):
         try:
-            booking = Booking.objects.select_related("concert").get(id=pk)
+            booking = Booking.objects.get(id=pk)
         except Booking.DoesNotExist:
             return response_generator(
                 status.HTTP_404_NOT_FOUND, "Invalid Object Reference"

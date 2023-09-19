@@ -9,4 +9,5 @@ urlpatterns = [
     path("concerts/", ConcertManagement.as_view(), name="concerts"),
     path("concert/<int:pk>", Concertdetail, name="concert"),
     path("bookings/", BookingMangement.as_view(), name="bookings"),
+    path("booking/<int:pk>",BookingMangement.as_view(),name="booking"),
 ]
