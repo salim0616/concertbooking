@@ -218,7 +218,7 @@ class BookingMangement(APIView):
 
     def delete(self, request, pk):
         try:
-            booking = Booking.objects.get(id=pk)
+            booking = Booking.objects.get(id=pk,user=request.user)
         except Booking.DoesNotExist:
             return response_generator(
                 status.HTTP_404_NOT_FOUND, "Invalid Object Reference"
