@@ -15,6 +15,7 @@ Assuming python already Installed.
   Windows:env_name/Scripts/Activate
   linux/Mac:source env_name/bin/activate
   cd .\concertbooking\concertbooking\
+  python manage.py migrate
   python manage.py runserver 
 
 ```
